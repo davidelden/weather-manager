@@ -1,2 +1,2 @@
 # weather-manager
-Subscription manager service for the Daily Weather application
+Weather subscription manager microservice for the daily weather app
