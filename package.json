@@ -1,0 +1,24 @@
+{
+  "name": "weather-manager",
+  "version": "1.0.0",
+  "description": "Weather subscription manager microservice for the daily weather app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "export NODE_ENV=development; node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-davidelden:davidelden/weather-manager.git"
+  },
+  "keywords": [
+    "weather",
+    "api",
+    "aws",
+    "sns",
+    "sms"
+  ],
+  "author": "David Elden",
+  "license": "MIT"
+}
