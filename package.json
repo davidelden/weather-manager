@@ -20,5 +20,8 @@
     "sms"
   ],
   "author": "David Elden",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "redis": "^2.8.0"
+  }
 }
