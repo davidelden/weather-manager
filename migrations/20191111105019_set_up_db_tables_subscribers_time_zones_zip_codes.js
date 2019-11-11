@@ -2,7 +2,7 @@ exports.up = function(knex) {
   return knex.schema
     .createTable('subscribers', tbl => {
       tbl.increments('id').primary();
-      tbl.string('arn').unique();
+      tbl.text('arn').unique();
       tbl.string('phone_number').unique();
       tbl.timestamps(true, true);
     })
