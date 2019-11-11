@@ -22,6 +22,7 @@
   "author": "David Elden",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "knex": "^0.20.1",
     "pg": "^7.12.1",
     "redis": "^2.8.0"
