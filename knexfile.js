@@ -5,7 +5,7 @@ module.exports = {
   connection: {
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
-    database: 'weather_packager_data'
+    database: 'weather_manager_data'
   },
   pool: {
     min: 2,
@@ -15,6 +15,6 @@ module.exports = {
     tableName: 'knex_migrations'
   },
   seeds: {
-    directory: './seeds/dev'
+    directory: './seeds'
   }
 };
