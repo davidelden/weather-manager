@@ -4,7 +4,7 @@ const express = require('express'),
 
 // Get all subscribers
 router.get('/', (req, res) => {
-  db.select('id', 'arn', 'phone_number')
+  db.select('id', 'phone_number')
     .table('subscribers')
     .then(data => res.json(data))
     .catch(err => {
@@ -14,30 +14,14 @@ router.get('/', (req, res) => {
 });
 
 // Get subscriber by phone number
-// *** Look into Postgres json_agg and array_agg functions
-// *** https://www.reddit.com/r/node/comments/aexin9/nesting_data_from_database_queries_with_joins_for/
-
 router.get('/:phone_number', (req, res) => {
   const { phone_number } = req.params;
 
-  db.select('id', 'arn', 'phone_number')
-    .from('subscribers')
-    .where({ phone_number: phone_number })
+  db.raw('SELECT row_to_json(sub) AS subscribers FROM (SELECT s.id, s.arn, s.phone_number, (SELECT array_agg(zip_code) FROM zip_codes INNER JOIN subscribers_zip_codes ON zip_codes.id = subscribers_zip_codes.zip_code_id WHERE subscribers_zip_codes.subscriber_id = s.id) AS zip_codes FROM subscribers AS s WHERE s.phone_number = ?) sub', phone_number)
     .then(data => {
-      const subscriber = { ...data[0] };
+      const subscriber = { ...data.rows[0].subscribers }
 
-      db.select('zip_code')
-        .from('zip_codes')
-        .innerJoin('subscribers_zip_codes', 'zip_codes.id', 'subscribers_zip_codes.zip_code_id')
-        .where({ 'subscribers_zip_codes.subscriber_id':  subscriber.id })
-        .then(zipCodes => {
-          subscriber.zip_codes = zipCodes.map(row => row.zip_code);
-          res.json(subscriber);
-        })
-        .catch(err => {
-          console.error(err);
-          res.sendStatus(500);
-        })
+      res.send(subscriber);
     })
     .catch(err => {
       console.error(err);
