@@ -3,6 +3,7 @@ const SNS = require('aws-sdk/clients/sns'),
       express = require('express'),
       router = express.Router(),
       db = require('../../db/connection.js'),
+      subscriberExists = require('../helpers/subscriberExists.js'),
       createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js');
 
 router.use(express.urlencoded({ extended: true }));
@@ -35,13 +36,13 @@ router.get('/:phone_number', (req, res) => {
 });
 
 // Add new subscriber
-router.post('/new', (req, res) => {
+router.post('/new', async (req, res) => {
   const { phone_number, zip_codes } = req.body,
-        params = createNewSubscriberSNSParams(phone_number, zip_codes);
+        params = createNewSubscriberSNSParams(phone_number, zip_codes),
+        exists = await subscriberExists(phone_number);
 
   // Check if subscriber exists
-  //  - abort if exists
-  //  - respond with 'Subscriber already exists' message
+  if(exists) return res.json({ message: 'Subscriber already exists.' });
 
   sns.subscribe(params, (err, data) => {
     if (err) {
