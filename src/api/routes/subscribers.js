@@ -4,6 +4,7 @@ const SNS = require('aws-sdk/clients/sns'),
       router = express.Router(),
       db = require('../../db/connection.js'),
       subscriberExists = require('../../db/helpers/subscriberExists.js'),
+      addNewSubscriber = require('../../db/helpers/addNewSubscriber.js'),
       createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js');
 
 router.use(express.urlencoded({ extended: true }));
@@ -50,18 +51,26 @@ router.post('/new', async (req, res) => {
       res.status(500).send(err);
     } else {
       const arn = data['SubscriptionArn'];
+      let newSubscriberID;
 
-      console.log(`New subscriber arn: ${arn}`);
       // Update subscriber table with new subscriber (arn, phone_number)
-      // Check if any zip_codes exist
-      //   - if not, create new zip_code
-      //      • need to look up which time_zone new zip_code is in
-      //      • once new zip_code is created, update subscribers_zip_codes table
-      //   - if yes, update subscribers_zip_codes table
+      addNewSubscriber(arn, phone_number)
+        .then(id => {
+          newSubscriberID = id;
+        })
+        .then(() => {
+          // Check if any zip_codes exist
+          //   - if not, create new zip_code
+          //      • need to look up which time_zone new zip_code is in
+          //      • once new zip_code is created, update subscribers_zip_codes table
+          //   - if yes, update subscribers_zip_codes table
 
-      res.json(data);
+          // zipCodesExist(zip_codes)
+        })
+        .catch(err => console.log(err));
     }
   })
+  res.send('Success!');
 });
 
 // Update subscriber zip codes
