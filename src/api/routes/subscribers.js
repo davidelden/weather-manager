@@ -3,7 +3,7 @@ const SNS = require('aws-sdk/clients/sns'),
       express = require('express'),
       router = express.Router(),
       db = require('../../db/connection.js'),
-      subscriberExists = require('../helpers/subscriberExists.js'),
+      subscriberExists = require('../../db/helpers/subscriberExists.js'),
       createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js');
 
 router.use(express.urlencoded({ extended: true }));
@@ -49,7 +49,9 @@ router.post('/new', async (req, res) => {
       console.log(err, err.stack);
       res.status(500).send(err);
     } else {
-      console.log(`New subscriber arn: ${data['SubscriptionArn']}`);
+      const arn = data['SubscriptionArn'];
+
+      console.log(`New subscriber arn: ${arn}`);
       // Update subscriber table with new subscriber (arn, phone_number)
       // Check if any zip_codes exist
       //   - if not, create new zip_code
