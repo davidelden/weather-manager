@@ -1,9 +1,9 @@
 const db = require('../../db/connection.js');
 
-const subscriberExists = phone_number => (
+const subscriberExists = phoneNumber => (
   db('subscribers')
     .count('phone_number')
-    .where('phone_number', phone_number)
+    .where('phone_number', phoneNumber)
     .then(data => {
       const { count } = data[0];
 
