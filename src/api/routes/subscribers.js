@@ -50,13 +50,16 @@ router.post('/new', async (req, res) => {
       console.log(err, err.stack);
       res.status(500).send(err);
     } else {
-      const arn = data['SubscriptionArn'];
-      let newSubscriberID;
+      const arn = data['SubscriptionArn'],
+            newSubscriber = {};
+
+      newSubscriber.arn = arn;
+      newSubscriber.phone_number = phone_number;
 
       // Update subscriber table with new subscriber (arn, phone_number)
       addNewSubscriber(arn, phone_number)
         .then(id => {
-          newSubscriberID = id;
+          newSubscriber.id = id;
         })
         .then(() => {
           // Check if any zip_codes exist
@@ -66,11 +69,14 @@ router.post('/new', async (req, res) => {
           //   - if yes, update subscribers_zip_codes table
 
           // zipCodesExist(zip_codes)
+          res.json(newSubscriber);
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          console.log(err);
+          res.status(500).send(err);
+        });
     }
   })
-  res.send('Success!');
 });
 
 // Update subscriber zip codes
