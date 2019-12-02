@@ -12,6 +12,7 @@ exports.seed = knex => {
         {time_zone: 'us_pacific'},
         {time_zone: 'us_alaska'},
         {time_zone: 'us_hawaii'},
+        {time_zone: 'us_samoa'}
       ]);
     });
 };
