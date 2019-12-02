@@ -2,7 +2,7 @@ exports.up = function(knex) {
   return knex.schema
     .createTable('zip_codes_time_zones_lookup', tbl => {
       tbl.string('zip_code').unique();
-      tbl.string('time_zone');
+      tbl.integer('time_zone_id').references('time_zones.id');
       tbl.string('state');
     })
 };
