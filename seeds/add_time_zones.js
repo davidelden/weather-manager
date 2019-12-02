@@ -4,6 +4,7 @@ exports.seed = knex => {
     .then(() => {
       // Inserts seed entries
       return knex('time_zones').insert([
+        {time_zone: 'us_atlantic'},
         {time_zone: 'us_eastern'},
         {time_zone: 'us_central'},
         {time_zone: 'us_mountain'},
