@@ -5,7 +5,6 @@ exports.seed = function(knex) {
   return knex('zip_codes_time_zones_lookup').del()
     .then(function () {
       // Inserts seed entries
-      // return knex('zip_codes_time_zones_lookup').insert(zipCodesTimeZones);
       return knex.raw(`COPY zip_codes_time_zones_lookup FROM '${csvFilePath}' DELIMITER ',' CSV HEADER`)
     });
 };
