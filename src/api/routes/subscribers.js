@@ -5,7 +5,8 @@ const SNS = require('aws-sdk/clients/sns'),
       db = require('../../db/connection.js'),
       subscriberExists = require('../../db/helpers/subscriberExists.js'),
       addNewSubscriber = require('../../db/helpers/addNewSubscriber.js'),
-      createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js');
+      createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js'),
+      attachZipCodesToSubscriber = require('../../db/helpers/attachZipCodesToSubscriber.js');
 
 router.use(express.urlencoded({ extended: true }));
 
@@ -60,15 +61,9 @@ router.post('/new', async (req, res) => {
       addNewSubscriber(arn, phone_number)
         .then(id => {
           newSubscriber.id = id;
+          attachZipCodesToSubscriber(id, zip_codes);
         })
         .then(() => {
-          // Check if any zip_codes exist
-          //   - if not, create new zip_code
-          //      • need to look up which time_zone new zip_code is in
-          //      • once new zip_code is created, update subscribers_zip_codes table
-          //   - if yes, update subscribers_zip_codes table
-
-          // zipCodesExist(zip_codes)
           res.json(newSubscriber);
         })
         .catch(err => {
