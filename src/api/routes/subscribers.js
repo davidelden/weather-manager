@@ -27,9 +27,11 @@ router.get('/:phone_number', (req, res) => {
 
   db.raw('SELECT row_to_json(sub) AS subscribers FROM (SELECT s.id, s.arn, s.phone_number, (SELECT array_agg(zip_code) FROM zip_codes INNER JOIN subscribers_zip_codes ON zip_codes.id = subscribers_zip_codes.zip_code_id WHERE subscribers_zip_codes.subscriber_id = s.id) AS zip_codes FROM subscribers AS s WHERE s.phone_number = ?) sub', phone_number)
     .then(data => {
-      const subscriber = { ...data.rows[0].subscribers }
+      if(data.rows.length === 0) return res.status(404).json({ message: `Subscriber ${phone_number} not found.` });
 
-      res.send(subscriber);
+      const { subscribers } = data.rows[0];
+
+      res.status(200).send(subscribers);
     })
     .catch(err => {
       console.error(err);
