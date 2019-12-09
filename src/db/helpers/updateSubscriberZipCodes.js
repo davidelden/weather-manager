@@ -4,15 +4,15 @@ const getZipCodesBySubscriberPhoneNumber = require('./getZipCodesBySubscriberPho
       getZipCodesToRemove = require('./getZipCodesToRemove.js'),
       attachZipCodesToSubscriber = require('./attachZipCodesToSubscriber.js');
 
-const updateSubscriberZipCodes = async (phoneNumber, zipCodes) => {
-  // zipCodes = ['78745', '33156', '01075']
+const updateSubscriberZipCodes = async (phoneNumber, updatedZipCodes) => {
+  // updatedZipCodes = ['78745', '33156', '01075']
   const subscriberID = await getSubscriberID(phoneNumber);
 
   if(subscriberID === 0) return { message: 'Subscriber not found.' };
 
   const currentZipCodes = await getZipCodesBySubscriberPhoneNumber(phoneNumber),
-        addZipCodes = getZipCodesToAdd(currentZipCodes, zipCodes),
-        removeZipCodes = getZipCodesToRemove(currentZipCodes, zipCodes),
+        addZipCodes = getZipCodesToAdd(currentZipCodes, updatedZipCodes),
+        removeZipCodes = getZipCodesToRemove(currentZipCodes, updatedZipCodes),
         zipCodesState = {};
 
   if(addZipCodes.length > 0) {
