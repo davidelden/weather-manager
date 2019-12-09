@@ -1,6 +1,6 @@
-const getZipCodesToRemove = (currentZipCodes, newZipCodes) => (
+const getZipCodesToRemove = (currentZipCodes, updatedZipCodes) => (
   currentZipCodes.filter(zipCode => {
-    return !newZipCodes.includes(zipCode);
+    return !updatedZipCodes.includes(zipCode);
   })
 )
 
