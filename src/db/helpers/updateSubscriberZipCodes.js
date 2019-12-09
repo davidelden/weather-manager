@@ -12,7 +12,8 @@ const updateSubscriberZipCodes = async (phoneNumber, zipCodes) => {
 
   const currentZipCodes = await getZipCodesBySubscriberPhoneNumber(phoneNumber),
         addZipCodes = getZipCodesToAdd(currentZipCodes, zipCodes),
-        removeZipCodes = getZipCodesToRemove(currentZipCodes, zipCodes);
+        removeZipCodes = getZipCodesToRemove(currentZipCodes, zipCodes),
+        zipCodesState = {};
 
   if(addZipCodes.length > 0) {
     attachZipCodesToSubscriber(subscriberID, addZipCodes); // This is async
@@ -26,7 +27,7 @@ const updateSubscriberZipCodes = async (phoneNumber, zipCodes) => {
 
   }
 
-  return currentZipCodes;
+  return zipCodesState;
 }
 
 module.exports = updateSubscriberZipCodes;
