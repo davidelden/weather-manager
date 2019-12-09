@@ -7,7 +7,7 @@ const SNS = require('aws-sdk/clients/sns'),
       addNewSubscriber = require('../../db/helpers/addNewSubscriber.js'),
       createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js'),
       attachZipCodesToSubscriber = require('../../db/helpers/attachZipCodesToSubscriber.js'),
-      updateSubscribersZipCodes = require('../../db/helpers/updateSubscribersZipCodes');
+      updateSubscriberZipCodes = require('../../db/helpers/updateSubscriberZipCodes');
 
 router.use(express.urlencoded({ extended: true }));
 
@@ -82,7 +82,7 @@ router.patch('/:phone_number/update', (req, res) => {
   const { phone_number } = req.params,
         { zip_codes } = req.body;
 
-  updateSubscribersZipCodes(phone_number, zip_codes)
+  updateSubscriberZipCodes(phone_number, zip_codes)
     .then(data => {
       res.status(200).json({ message: 'testing', current_zip_codes: data })
     })

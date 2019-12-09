@@ -2,7 +2,7 @@ const getZipCodesBySubscriberPhoneNumber = require('./getZipCodesBySubscriberPho
       getZipCodesToAdd = require('./getZipCodesToAdd.js'),
       getZipCodesToRemove = require('./getZipCodesToRemove.js');
 
-const updateSubscribersZipCodes = async (phoneNumber, zipCodes) => {
+const updateSubscriberZipCodes = async (phoneNumber, zipCodes) => {
   // zipCodes = ['78745', '33156', '01075']
   const currentZipCodes = await getZipCodesBySubscriberPhoneNumber(phoneNumber),
         addZipCodes = getZipCodesToAdd(currentZipCodes, zipCodes),
@@ -32,4 +32,4 @@ const updateSubscribersZipCodes = async (phoneNumber, zipCodes) => {
   return currentZipCodes;
 }
 
-module.exports = updateSubscribersZipCodes;
+module.exports = updateSubscriberZipCodes;
