@@ -84,7 +84,7 @@ router.patch('/:phone_number/update', (req, res) => {
 
   updateSubscriberZipCodes(phone_number, zip_codes)
     .then(data => {
-      res.status(200).json({ message: 'testing', current_zip_codes: data })
+      res.status(200).json({ data: data })
     })
     .catch(err => {
       console.log(err);
