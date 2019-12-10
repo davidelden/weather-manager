@@ -2,10 +2,13 @@ const getZipCodesBySubscriberPhoneNumber = require('./getZipCodesBySubscriberPho
       getSubscriberID = require('./getSubscriberID.js'),
       getZipCodesToAdd = require('./getZipCodesToAdd.js'),
       getZipCodesToRemove = require('./getZipCodesToRemove.js'),
-      attachZipCodesToSubscriber = require('./attachZipCodesToSubscriber.js');
+      getZipCodeIDs = require('./getZipCodeIDs.js'),
+      attachZipCodesToSubscriber = require('./attachZipCodesToSubscriber.js'),
+      detachZipCodesFromSubscriber = require('./detachZipCodesFromSubscriber.js'),
+      zipCodeIdExistsInSubscribersZipCodes = require('./zipCodeIdExistsInSubscribersZipCodes.js'),
+      deleteZipCodeByID = require('./deleteZipCodeByID.js');
 
 const updateSubscriberZipCodes = async (phoneNumber, updatedZipCodes) => {
-  // updatedZipCodes = ['78745', '33156', '01075']
   const subscriberID = await getSubscriberID(phoneNumber);
 
   if(subscriberID === 0) return { message: 'Subscriber not found.' };
@@ -16,17 +19,27 @@ const updateSubscriberZipCodes = async (phoneNumber, updatedZipCodes) => {
         zipCodesState = {};
 
   if(addZipCodes.length > 0) {
-    attachZipCodesToSubscriber(subscriberID, addZipCodes); // This is async
+    zipCodesState.addedZipCodes = await attachZipCodesToSubscriber(subscriberID, addZipCodes)
+      .then(() => addZipCodes)
+      .catch(err => console.log(err));
   }
 
   if(removeZipCodes.length > 0) {
-    // Check if the removal of the zipCode from the subscriber results in an orphan
-    // (i.e. the zipCode will belong to no subscriber)
+    const removeZipCodesIDs = await getZipCodeIDs(removeZipCodes);
 
-    // if orphan >>> remove zipCode from zip_codes table && publish message
+    zipCodesState.removedZipCodes = await detachZipCodesFromSubscriber(subscriberID, removeZipCodesIDs)
+      .then(() => removeZipCodes)
+      .catch(err => console.log(err));
+
+    removeZipCodesIDs.forEach(async id => {
+      let zipCodeStillActive = await zipCodeIdExistsInSubscribersZipCodes(id);
+
+      if(!zipCodeStillActive) {
+        deleteZipCodeByID(id);
+      }
+    });
 
   }
-
   return zipCodesState;
 }
 
