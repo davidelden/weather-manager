@@ -18,6 +18,8 @@ const updateSubscriberZipCodes = async (phoneNumber, updatedZipCodes) => {
         removeZipCodes = getZipCodesToRemove(currentZipCodes, updatedZipCodes),
         zipCodesState = {};
 
+  if(addZipCodes.length === 0 && removeZipCodes.length === 0) return { message: `No updates made on subscriber ${phoneNumber}` };
+
   if(addZipCodes.length > 0) {
     zipCodesState.addedZipCodes = await attachZipCodesToSubscriber(subscriberID, addZipCodes)
       .then(() => addZipCodes)

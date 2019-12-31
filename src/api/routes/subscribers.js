@@ -84,7 +84,6 @@ router.patch('/:phone_number/update', (req, res) => {
 
   updateSubscriberZipCodes(phone_number, zip_codes)
     .then(data => {
-      if(Object.keys(data).length === 0) return res.status(200).json({ data: { message: `No updates made on subscriber ${phone_number}` } });
       res.status(200).json({ data: data })
     })
     .catch(err => {
