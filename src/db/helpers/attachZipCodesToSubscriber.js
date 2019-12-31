@@ -3,17 +3,18 @@ const db = require('../connection.js'),
       getZipCodeTimeZone = require('./getZipCodeTimeZone.js'),
       addNewZipCode = require('./addNewZipCode.js');
 
-const addSubscribersZipCode = (subscriberID, zipCodeID) => {
+const addSubscribersZipCode = (subscriberID, zipCodeID) => (
   db.insert({ subscriber_id: subscriberID, zip_code_id: zipCodeID })
     .into('subscribers_zip_codes')
     .catch(err => {
       console.error(err);
-    });
-}
+    })
+)
 
 const attachZipCodesToSubscriber = async (subscriberID, zipCodes) => {
-  zipCodes.forEach(async code => {
-    let zipCodeID = await getZipCodeID(code);
+  for(let i = 0; i < zipCodes.length; i++) {
+    let code = zipCodes[i],
+        zipCodeID = await getZipCodeID(code);
 
     if(!zipCodeID) {
       const zipCodeTimeZone = await getZipCodeTimeZone(code);
@@ -25,8 +26,8 @@ const attachZipCodesToSubscriber = async (subscriberID, zipCodes) => {
       zipCodeID = await addNewZipCode(code, zipCodeTimeZone);
     }
 
-    addSubscribersZipCode(subscriberID, zipCodeID);
-  });
+    await addSubscribersZipCode(subscriberID, zipCodeID);
+  }
 }
 
 module.exports = attachZipCodesToSubscriber;
