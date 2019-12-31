@@ -38,8 +38,10 @@ const updateSubscriberZipCodes = async (phoneNumber, updatedZipCodes) => {
         deleteZipCodeByID(id);
       }
     });
-
   }
+
+  zipCodesState.subscriberZipCodes = await getZipCodesBySubscriberPhoneNumber(phoneNumber);
+
   return zipCodesState;
 }
 
