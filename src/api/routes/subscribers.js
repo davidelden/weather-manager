@@ -7,7 +7,9 @@ const SNS = require('aws-sdk/clients/sns'),
       addNewSubscriber = require('../../db/helpers/addNewSubscriber.js'),
       createNewSubscriberSNSParams = require('../helpers/createNewSubscriberSNSParams.js'),
       attachZipCodesToSubscriber = require('../../db/helpers/attachZipCodesToSubscriber.js'),
-      updateSubscriberZipCodes = require('../../db/helpers/updateSubscriberZipCodes');
+      updateSubscriberZipCodes = require('../../db/helpers/updateSubscriberZipCodes.js'),
+      getSubscriberARN = require('../../db/helpers/getSubscriberARN.js'),
+      updateSubscriberSNSParams = require('../helpers/updateSubscriberSNSParams.js');
 
 router.use(express.urlencoded({ extended: true }));
 
@@ -83,8 +85,25 @@ router.patch('/:phone_number/update', (req, res) => {
         { zip_codes } = req.body;
 
   updateSubscriberZipCodes(phone_number, zip_codes)
-    .then(data => {
-      res.status(200).json({ data: data })
+    .then(async data => {
+      const { subscriberZipCodes } = data;
+
+      if(!subscriberZipCodes) return res.status(200).json(data);
+
+      const arn = await getSubscriberARN(phone_number);
+
+      if(!arn) return res.status(200).json({ message: `ARN for ${phone_number} not found.` });
+
+      const params = updateSubscriberSNSParams(arn, subscriberZipCodes);
+
+      sns.setSubscriptionAttributes(params, (err, snsData) => {
+        if (err) {
+          console.log(err, err.stack);
+          res.status(500).send(err);
+        } else {
+          res.status(200).json({ data: data, snsData: snsData });
+        }
+      })
     })
     .catch(err => {
       console.log(err);
