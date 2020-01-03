@@ -9,7 +9,12 @@ const SNS = require('aws-sdk/clients/sns'),
       attachZipCodesToSubscriber = require('../../db/helpers/attachZipCodesToSubscriber.js'),
       updateSubscriberZipCodes = require('../../db/helpers/updateSubscriberZipCodes.js'),
       getSubscriberARN = require('../../db/helpers/getSubscriberARN.js'),
-      updateSubscriberSNSParams = require('../helpers/updateSubscriberSNSParams.js');
+      updateSubscriberSNSParams = require('../helpers/updateSubscriberSNSParams.js'),
+      getZipCodesBySubscriberPhoneNumber = require('../../db/helpers/getZipCodesBySubscriberPhoneNumber.js'),
+      getZipCodeIDs = require('../../db/helpers/getZipCodeIDs.js'),
+      zipCodeIdExistsInSubscribersZipCodes = require('../../db/helpers/zipCodeIdExistsInSubscribersZipCodes.js'),
+      deleteZipCodeByID = require('../../db/helpers/deleteZipCodeByID.js'),
+      deleteSubscriber = require('../../db/helpers/deleteSubscriber.js');
 
 router.use(express.urlencoded({ extended: true }));
 
@@ -111,6 +116,33 @@ router.patch('/:phone_number/update', (req, res) => {
     })
 });
 
-// Opt back in subscriber
+// Delete a subscriber
+router.delete('/:phone_number/delete', async (req, res) => {
+  const { phone_number } = req.params,
+        arn = await getSubscriberARN(phone_number),
+        params = { SubscriptionArn: arn };
+        subscriberZipCodeIDs = await getZipCodesBySubscriberPhoneNumber(phone_number)
+                                      .then(zipCodes => getZipCodeIDs(zipCodes));
+
+  if(!arn) return res.status(200).json({ message: `The ARN for subscriber ${phone_number} is not found.` })
+
+  sns.unsubscribe(params, (err, data) => {
+    if(err) {
+      console.log(err, err.stack);
+      res.status(500).send(err);
+    } else {
+      deleteSubscriber(phone_number)
+        .then(async () => {
+          for(let i = 0; i < subscriberZipCodeIDs.length; i++) {
+            const id = subscriberZipCodeIDs[i],
+                  idExists = await zipCodeIdExistsInSubscribersZipCodes(id);
+
+            if(!idExists) await deleteZipCodeByID(id);
+          }
+        })
+      res.status(200).json({ message: `Subscriber ${phone_number} has been deleted.` });
+    }
+  });
+});
 
 module.exports = router;
