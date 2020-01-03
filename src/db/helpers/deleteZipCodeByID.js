@@ -4,7 +4,7 @@ const deleteZipCodeByID = zipCodeID => (
   db('zip_codes')
     .where('id', zipCodeID)
     .del()
-    .catch(err => console.log(error))
+    .catch(err => console.log(err))
 )
 
 module.exports = deleteZipCodeByID;
